@@ -1,0 +1,24 @@
+{
+  "name": "add-ean-tool",
+  "version": "1.0.0",
+  "description": "Tool to add a column for EAN codes to SKU in reports",
+  "type": "module",
+  "main": "upload-file.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "run": "tsc && nodemon src/upload-file.js"
+  },
+  "author": "Eva Greiner-Anzenbacher",
+  "license": "ISC",
+  "dependencies": {
+    "csvtojson": "^2.0.10",
+    "express": "^4.17.1",
+    "fs-extra": "^9.1.0",
+    "multer": "^1.4.2",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^9.0.10",
+    "@types/node": "^14.14.37"
+  }
+}

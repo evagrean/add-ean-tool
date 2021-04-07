@@ -1,0 +1,4 @@
+node_modules
+**/*.js
+uploads/**/*
+GUS.QUER_ARTIKEL_INFO.csv
