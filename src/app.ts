@@ -25,7 +25,7 @@ const storage = multer.diskStorage({
   fileFilter: (req, file, cb) => {
     if (file.mimetype !== "text/csv" || file.mimetype !== "text/plain" || file.mimetype !== "text/tsv") {
       // reject file
-      cb(new Error("Only csv, tsv or txt format allowed"));
+      return cb(new Error("Only csv, tsv or txt format allowed"));
     } else {
       // accept file
       cb(null, true);
