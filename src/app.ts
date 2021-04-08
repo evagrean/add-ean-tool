@@ -42,13 +42,15 @@ app.post("/upload", upload.single("report"), (req, res) => {
     // Get report file or throw ex on error
     try {
       // load file
-      const raw = fs.readFile(`uploads/${req.file.filename}`).toString();
-      // need something to safe for later use
-      const data = raw.split("\n");
-      console.log(data);
+      const raw = fs.readFile(`uploads/${req.file.filename}`);
+      //
+      // need something to store data for later use here ...
+      //
+      console.log(raw);
 
       // Delete upload after being used
-      fs.unlinkSync(`uploads/${req.file.filename}`);
+    //   fs.unlinkSync(`uploads/${req.file.filename}`);
+    
     } catch (error) {
       console.log(error);
       res.status(500).send({
@@ -58,7 +60,7 @@ app.post("/upload", upload.single("report"), (req, res) => {
     }
     res.status(200).send({
       ok: true,
-      error: "File uploaded",
+      message: "File uploaded",
     });
   } else {
     res.status(400).send({
