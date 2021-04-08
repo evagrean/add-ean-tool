@@ -1,7 +1,7 @@
 import express from "express";
 import multer from "multer";
 import fs from "fs-extra";
-import csv from "csvtojson";
+import csv from "csv";
 
 // Setup express
 const app = express();
@@ -45,12 +45,9 @@ app.post("/upload", upload.single("report"), (req, res) => {
       const raw = fs.readFile(`uploads/${req.file.filename}`);
       //
       // need something to store data for later use here ...
-      //
-      console.log(raw);
 
       // Delete upload after being used
-    //   fs.unlinkSync(`uploads/${req.file.filename}`);
-    
+      //   fs.unlinkSync(`uploads/${req.file.filename}`);
     } catch (error) {
       console.log(error);
       res.status(500).send({
@@ -69,8 +66,6 @@ app.post("/upload", upload.single("report"), (req, res) => {
     });
   }
 });
-
-let filepath = `uploads/test-report.csv`;
 
 // Start server
 app.listen(port, () => console.log("App is listening..."));
