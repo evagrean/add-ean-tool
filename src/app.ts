@@ -23,9 +23,9 @@ const storage = multer.diskStorage({
   },
   // make sure only specific files can be uploaded
   fileFilter: (req, file, cb) => {
-    if (file.mimetype !== "text/comma-separated-values" || file.mimetype !== "text/plain" || file.mimetype !== "text/tab-separated-values") {
+    if (file.mimetype !== "text/csv" || file.mimetype !== "text/plain" || file.mimetype !== "text/tsv") {
       // reject file
-      cb(new Error("Forbidden file type"));
+      cb(new Error("Only csv, tsv or txt format allowed"));
     } else {
       // accept file
       cb(null, true);
