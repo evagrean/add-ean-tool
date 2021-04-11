@@ -1,7 +1,10 @@
 import express from "express";
 import multer from "multer";
 import fs from "fs-extra";
-import csv from "csv";
+import csv from "csvtojson";
+
+let referenceData;
+let uploadedData: any[];
 
 // Setup express
 const app = express();
@@ -21,51 +24,63 @@ const storage = multer.diskStorage({
     const { originalname } = file;
     cb(null, Date.now() + "-" + originalname);
   },
-  // make sure only specific files can be uploaded
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype !== "text/csv" || file.mimetype !== "text/plain" || file.mimetype !== "text/tsv") {
-      // reject file
-      return cb(new Error("Only csv, tsv or txt format allowed"));
-    } else {
-      // accept file
-      cb(null, true);
-    }
-  },
 });
 
 // Setup multer
 const upload = multer({ storage });
 
-// Setup upload route
-app.post("/upload", upload.single("report"), (req, res) => {
+// Setup upload route and run all the logic on post
+app.post("/upload", upload.single("report"), (req, res, next) => {
   if (req.file) {
-    // Get report file or throw ex on error
-    try {
-      // load file
-      const raw = fs.readFile(`uploads/${req.file.filename}`);
-      //
-      // need something to store data for later use here ...
-
-      // Delete upload after being used
-      //   fs.unlinkSync(`uploads/${req.file.filename}`);
-    } catch (error) {
-      console.log(error);
-      res.status(500).send({
-        ok: false,
-        error: "Something went wrong. Please check format",
-      });
-    }
-    res.status(200).send({
-      ok: true,
-      message: "File uploaded",
-    });
+    console.log("uploaded " + req.file.filename);
+    return next();
+    // Delete upload after being used
+    //   fs.unlinkSync(`uploads/${req.file.filename}`);
   } else {
     res.status(400).send({
       ok: false,
-      error: "Please upload a file",
+      error: "Something went wrong. Please upload a file",
     });
   }
 });
 
+app.post("/upload", async (req, res, next) => {
+  const uploadedFilePath = `uploads/${req.file.filename}`;
+  const jsonArray = await csv({ delimiter: "auto" }).fromFile(uploadedFilePath);
+  uploadedData = jsonArray;
+  //console.log(uploadedData);
+  return next();
+});
+
+app.post("/upload", async (req, res, next) => {
+  const referenceFilePath = "referenceData.csv";
+  const jsonArray = await csv({ delimiter: "auto" }).fromFile(referenceFilePath);
+  referenceData = jsonArray;
+
+  // referenceData = jsonArray;
+  return next();
+});
+
+app.post("/upload", (req, res) => {
+  compareUploadedAndRefernceData(referenceData, uploadedData);
+  //fs.unlinkSync(`uploads/${req.file.filename}`);
+  return res.json({ status: "ok" });
+});
+
+const compareUploadedAndRefernceData = (referenceData, uploadedData) => {
+  let referenceArticleNumber;
+  let uploadedSKU;
+  // die zwei ARtikel-Nummern müssen vorher noch gesplittet werden
+  uploadedData.map((dataEntry) => {
+    const sku = dataEntry.sku;
+    referenceData.find((referenceEntry) => (referenceEntry.ARTIKEL_NUMMER.includes(sku) ? (dataEntry.EAN = referenceEntry.BARCODE) : null));
+  });
+  console.log(uploadedData);
+};
+
 // Start server
 app.listen(port, () => console.log("App is listening..."));
+
+// Artikelnummern in referenceData aufsplitten
+// EAN an andere Stelle?
+// uploadedData zurück in CSV und zum Download anbieten

@@ -6,12 +6,12 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "run": "tsc && nodemon src/app.js"
+    "run": "tsc && node src/app.js"
   },
   "author": "Eva Greiner-Anzenbacher",
   "license": "ISC",
   "dependencies": {
-    "csv": "^5.5.0",
+    "csv-parser": "^3.0.0",
     "csvtojson": "^2.0.10",
     "express": "^4.17.1",
     "fs-extra": "^9.1.0",
