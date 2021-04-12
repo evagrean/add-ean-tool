@@ -53,7 +53,7 @@ app.post("/upload", async (req, res, next) => {
   const jsonArray = await csvtojson({ delimiter: "auto" }).fromFile(uploadedFilePath);
   uploadedData = jsonArray;
   //console.log(uploadedData);
-  return next();
+  next();
 });
 
 app.post("/upload", async (req, res, next) => {
@@ -62,11 +62,13 @@ app.post("/upload", async (req, res, next) => {
   referenceData = jsonArray;
 
   // referenceData = jsonArray;
-  return next();
+  next();
 });
 
 app.post("/upload", (req, res, next) => {
   const originalFilename = req.file.originalname;
+  const fileName = `EAN-${originalFilename}`;
+  const filePath = `public/downloads/${fileName}`;
   const jsonWithEAN = addRelatedEANToUploadedData(referenceData, uploadedData);
   //console.log(jsonWithEAN);
   // only for testing download in advance - to be deleted afterwards
@@ -75,16 +77,22 @@ app.post("/upload", (req, res, next) => {
       throw err;
     }
   });
-  convertJSONBackToCSV(jsonWithEAN, originalFilename);
+  convertJSONAndGenerateCSVFile(jsonWithEAN, filePath);
 
-  return next();
+  next();
 });
 
 app.post("/upload", (req, res) => {
+  const originalFilename = req.file.originalname;
+  const fileName = `EAN-${originalFilename}`;
+  const filePath = `public/downloads/${fileName}`;
   if (req.file) {
     fs.unlinkSync(`uploads/${req.file.filename}`);
   }
-  res.json({ status: "generated" });
+  //   res.send(`<form action="/upload" method="get">
+  //   <input type="submit" value="Download file" />
+  // </form>`);
+  res.download(filePath);
 });
 
 const addRelatedEANToUploadedData = (referenceData, uploadedData) => {
@@ -99,24 +107,19 @@ const addRelatedEANToUploadedData = (referenceData, uploadedData) => {
   return validJSONDataWithEAN;
 };
 
-const convertJSONBackToCSV = (jsonWithEAN, originalFilename) => {
-  const fileName = `EAN-${originalFilename}`;
-  const filePath = `downloads/${fileName}`;
+const convertJSONAndGenerateCSVFile = (jsonWithEAN, filePath) => {
   jsonConverter.json2csv(jsonWithEAN, (err, csvWithEAN) => {
     if (err) {
       throw err;
     }
-    fs.writeFile(filePath, JSON.stringify(csvWithEAN), (err) => {
+    fs.writeFile(filePath, csvWithEAN, (err) => {
       if (err) {
         throw err;
       }
     });
+    console.log(csvWithEAN);
   });
 };
 
 // Start server
 app.listen(port, () => console.log("App is listening..."));
-
-// Artikelnummern in referenceData aufsplitten
-// EAN an andere Stelle?
-// uploadedData zurück in CSV und zum Download anbieten
