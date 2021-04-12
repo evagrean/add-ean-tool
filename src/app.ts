@@ -2,6 +2,7 @@ import express from "express";
 import multer from "multer";
 import fs from "fs-extra";
 import csv from "csvtojson";
+import json2csv from "json2csv";
 
 let referenceData;
 let uploadedData: any[];
@@ -34,8 +35,6 @@ app.post("/upload", upload.single("report"), (req, res, next) => {
   if (req.file) {
     console.log("uploaded " + req.file.filename);
     return next();
-    // Delete upload after being used
-    //   fs.unlinkSync(`uploads/${req.file.filename}`);
   } else {
     res.status(400).send({
       ok: false,
@@ -61,21 +60,40 @@ app.post("/upload", async (req, res, next) => {
   return next();
 });
 
-app.post("/upload", (req, res) => {
-  compareUploadedAndRefernceData(referenceData, uploadedData);
-  //fs.unlinkSync(`uploads/${req.file.filename}`);
-  return res.json({ status: "ok" });
+app.post("/upload", (req, res, next) => {
+  const dataWithEAN = addRelatedEANToUploadedData(referenceData, uploadedData);
+  console.log(dataWithEAN);
+  // only for testing download in advance - to be deleted afterwards
+  fs.writeFile("test-output.json", dataWithEAN, (err) => {});
+
+  return next();
 });
 
-const compareUploadedAndRefernceData = (referenceData, uploadedData) => {
-  let referenceArticleNumber;
-  let uploadedSKU;
+// app.post("/upload", (req, res, next) => {
+//   // make a csv out of json data
+//   return next();
+// });
+
+app.post("/upload", (req, res) => {
+  if (req.file) {
+    fs.unlinkSync(`uploads/${req.file.filename}`);
+  }
+  res.json({ status: "generated" });
+});
+
+const addRelatedEANToUploadedData = (referenceData, uploadedData) => {
+  const uploadedDataToModify = uploadedData;
   // die zwei ARtikel-Nummern müssen vorher noch gesplittet werden
-  uploadedData.map((dataEntry) => {
+  uploadedDataToModify.map((dataEntry) => {
     const sku = dataEntry.sku;
     referenceData.find((referenceEntry) => (referenceEntry.ARTIKEL_NUMMER.includes(sku) ? (dataEntry.EAN = referenceEntry.BARCODE) : null));
   });
-  console.log(uploadedData);
+  const validJSONDataWithEAN = JSON.stringify(uploadedDataToModify);
+  return validJSONDataWithEAN;
+};
+
+const convertJSONBackToCSV = (dataWithEAN) => {
+  const fields = ["amazon-order-id"];
 };
 
 // Start server
