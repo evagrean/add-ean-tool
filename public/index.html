@@ -8,9 +8,19 @@
   </head>
   <body>
     <h1>Report Upload</h1>
-    <form action="/upload" method="post" enctype="multipart/form-data">
-      <input type="file" name="report" />
-      <input type="submit" value="Upload file" />
-    </form>
+    <div>
+      <h2>Bitte beachten</h2>
+      In der hochgeladenen csv-Datei muss die SKU in einer Spalte mit dem Titel "sku" stehen. <br />
+      Der Download enthält die Original-Datei, ergänzt um die Spalten "EAN" und "skuFromReference", um die jeweilige SKU nochmal abgleichen zu können.
+    </div>
+    <br />
+    <hr />
+    <br />
+    <div>
+      <form action="/upload" method="post" enctype="multipart/form-data">
+        <input type="file" name="report" />
+        <input type="submit" value="Upload file" />
+      </form>
+    </div>
   </body>
 </html>

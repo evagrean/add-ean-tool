@@ -48,16 +48,25 @@ app.post("/upload", upload.single("report"), (req, res, next) => {
 
 app.post("/upload", async (req, res, next) => {
   const uploadedFilePath = `uploads/${req.file.filename}`;
-  const jsonArray = await csvtojson({ delimiter: "auto" }).fromFile(uploadedFilePath);
-  uploadedData = jsonArray;
+  try {
+    const jsonArray = await csvtojson({ delimiter: "auto" }).fromFile(uploadedFilePath);
+    uploadedData = jsonArray;
+  } catch (error) {
+    console.error(error);
+  }
 
   next();
 });
 
 app.post("/upload", async (req, res, next) => {
   const referenceFilePath = "referenceData.csv";
-  const jsonArray = await csvtojson({ delimiter: "auto" }).fromFile(referenceFilePath);
-  referenceData = jsonArray;
+  try {
+    const jsonArray = await csvtojson({ delimiter: "auto" }).fromFile(referenceFilePath);
+    referenceData = jsonArray;
+  } catch (error) {
+    console.error(error);
+  }
+
   // need to split ARTIKEL_NUMMER if string there contains two comma seperated numbers
   for (let referenceEntry of referenceData) {
     referenceEntry.ARTIKEL_NUMMER = referenceEntry.ARTIKEL_NUMMER.split(", ");
