@@ -6,7 +6,7 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "run": "node src/app.js"
+    "run": "node app.js"
   },
   "author": "Eva Greiner-Anzenbacher",
   "license": "ISC",
@@ -23,6 +23,6 @@
     "@types/node": "^14.14.37"
   },
   "engines": {
-"node": "12.x"
+    "node": "12.x"
   }
 }
