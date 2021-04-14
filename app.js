@@ -76,13 +76,13 @@ app.post("/upload", async (req, res, next) => {
 app.post("/upload", (req, res, next) => {
   originalFilename = req.file.originalname;
   fileName = `EAN-${originalFilename}`;
-  filePath = `downloads/${fileName}`;
+  filePath = `./downloads/${fileName}`;
   const jsonWithEAN = addRelatedEANToUploadedData(referenceData, uploadedData);
 
   convertJSONAndGenerateCSVFile(jsonWithEAN, filePath);
 
   if (req.file) {
-    fs.unlinkSync(`uploads/${req.file.filename}`);
+    fs.unlinkSync(`./uploads/${req.file.filename}`);
   }
 
   res.send(`<form action="/download" method="get">
