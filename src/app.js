@@ -69,7 +69,7 @@ app.post("/upload", async (req, res, next) => {
 app.post("/upload", (req, res, next) => {
   originalFilename = req.file.originalname;
   fileName = `EAN-${originalFilename}`;
-  filePath = `public/downloads/${fileName}`;
+  filePath = `downloads/${fileName}`;
   const jsonWithEAN = addRelatedEANToUploadedData(referenceData, uploadedData);
 
   convertJSONAndGenerateCSVFile(jsonWithEAN, filePath);
