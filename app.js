@@ -123,4 +123,6 @@ const convertJSONAndGenerateCSVFile = async (jsonWithEAN, filePath) => {
 
 // Start server
 const port = process.env.PORT || 3000;
-app.listen(port, () => console.log("Server is running..."));
+app.listen(port, function () {
+  console.log("Server is running on port " + this.address().port);
+});
