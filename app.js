@@ -33,6 +33,9 @@ const upload = multer({ storage });
 
 // Setup upload route and run all the logic on post
 app.post("/upload", upload.single("report"), (req, res, next) => {
+  // remove old download-files if existing
+  fs.emptyDirSync("downloads");
+
   if (req.file) {
     console.log("uploaded " + req.file.filename);
     return next();
