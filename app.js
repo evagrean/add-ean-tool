@@ -13,8 +13,6 @@ let filePath;
 // Setup express
 const app = express();
 
-const port = process.env.PORT || 3000;
-
 app.use(express.static("public"));
 
 // Setup storage - allows us to customize the way that multer stores the files
@@ -121,4 +119,5 @@ const convertJSONAndGenerateCSVFile = async (jsonWithEAN, filePath) => {
 };
 
 // Start server
-app.listen(port, () => console.log("App is listening..."));
+const port = process.env.PORT || 3000;
+app.listen(port, "0.0.0.0", () => console.log("Server is running..."));
