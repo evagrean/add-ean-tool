@@ -1,6 +1,9 @@
 {
   "name": "add-ean-tool",
   "version": "1.0.0",
+  "engines": {
+    "node": "12.17.0"
+  },
   "description": "Tool to add a column for EAN codes to SKU in reports",
   "type": "module",
   "main": "app.js",
@@ -21,8 +24,5 @@
   "devDependencies": {
     "@types/fs-extra": "^9.0.10",
     "@types/node": "^14.14.37"
-  },
-  "engines": {
-    "node": "12.x"
   }
 }
