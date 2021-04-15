@@ -35,10 +35,11 @@ const upload = multer({ storage });
 app.post("/upload", upload.single("report"), (req, res, next) => {
   // remove old download-files if existing
   fs.emptyDirSync("downloads");
+  fs.emptyDirSync("uploads");
 
   if (req.file) {
     console.log("uploaded " + req.file.filename);
-    return next();
+    next();
   } else {
     res.status(400).send({
       ok: false,
@@ -49,32 +50,29 @@ app.post("/upload", upload.single("report"), (req, res, next) => {
 
 app.post("/upload", async (req, res, next) => {
   const uploadedFilePath = `uploads/${req.file.filename}`;
-  try {
-    const jsonArray = await csvtojson({ delimiter: "auto" }).fromFile(uploadedFilePath);
-    uploadedData = jsonArray;
-  } catch (error) {
-    console.error(error);
-  }
-
-  next();
-});
-
-app.post("/upload", async (req, res, next) => {
   const referenceFilePath = "referenceData.csv";
-  try {
-    const jsonArray = await csvtojson({ delimiter: "auto" }).fromFile(referenceFilePath);
-    referenceData = jsonArray;
-  } catch (error) {
-    console.error(error);
-  }
+  uploadedData = await convertCSVToJSON(uploadedFilePath);
+  referenceData = await convertCSVToJSON(referenceFilePath);
 
-  // need to split ARTIKEL_NUMMER if string there contains two comma seperated numbers
+  //split ARTIKEL_NUMMER if string contains two article numbers
   for (let referenceEntry of referenceData) {
     referenceEntry.ARTIKEL_NUMMER = referenceEntry.ARTIKEL_NUMMER.split(", ");
   }
 
   next();
 });
+
+// app.post("/upload", async (req, res, next) => {
+//   const referenceFilePath = "referenceData.csv";
+//   referenceData = await convertCSVToJSON(referenceFilePath);
+
+//   //split ARTIKEL_NUMMER if string contains two article numbers
+//   for (let referenceEntry of referenceData) {
+//     referenceEntry.ARTIKEL_NUMMER = referenceEntry.ARTIKEL_NUMMER.split(", ");
+//   }
+
+//   next();
+// });
 
 app.post("/upload", (req, res, next) => {
   originalFilename = req.file.originalname;
@@ -84,9 +82,9 @@ app.post("/upload", (req, res, next) => {
 
   convertJSONAndGenerateCSVFile(jsonWithEAN, filePath);
 
-  if (req.file) {
-    fs.unlinkSync(`./uploads/${req.file.filename}`);
-  }
+  // if (req.file) {
+  //   fs.unlinkSync(`./uploads/${req.file.filename}`);
+  // }
 
   res.send(`<form action="/download" method="get">
   <button>Download file with EAN</button>
@@ -96,6 +94,15 @@ app.post("/upload", (req, res, next) => {
 app.get("/download", (req, res, next) => {
   res.download(filePath);
 });
+
+const convertCSVToJSON = async (filePath) => {
+  try {
+    const jsonArray = await csvtojson({ delimiter: "auto" }).fromFile(filePath);
+    return jsonArray;
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 const addRelatedEANToUploadedData = (referenceData, uploadedData) => {
   const uploadedDataToModify = uploadedData;
