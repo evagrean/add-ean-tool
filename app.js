@@ -35,7 +35,6 @@ const upload = multer({ storage });
 app.post("/upload", upload.single("report"), (req, res, next) => {
   // remove old download-files if existing
   fs.emptyDirSync("downloads");
-  fs.emptyDirSync("uploads");
 
   if (req.file) {
     console.log("uploaded " + req.file.filename);
@@ -62,18 +61,6 @@ app.post("/upload", async (req, res, next) => {
   next();
 });
 
-// app.post("/upload", async (req, res, next) => {
-//   const referenceFilePath = "referenceData.csv";
-//   referenceData = await convertCSVToJSON(referenceFilePath);
-
-//   //split ARTIKEL_NUMMER if string contains two article numbers
-//   for (let referenceEntry of referenceData) {
-//     referenceEntry.ARTIKEL_NUMMER = referenceEntry.ARTIKEL_NUMMER.split(", ");
-//   }
-
-//   next();
-// });
-
 app.post("/upload", (req, res, next) => {
   originalFilename = req.file.originalname;
   fileName = `EAN-${originalFilename}`;
@@ -82,9 +69,9 @@ app.post("/upload", (req, res, next) => {
 
   convertJSONAndGenerateCSVFile(jsonWithEAN, filePath);
 
-  // if (req.file) {
-  //   fs.unlinkSync(`./uploads/${req.file.filename}`);
-  // }
+  if (req.file) {
+    fs.unlinkSync(`uploads/${req.file.filename}`);
+  }
 
   res.send(`<form action="/download" method="get">
   <button>Download file with EAN</button>
